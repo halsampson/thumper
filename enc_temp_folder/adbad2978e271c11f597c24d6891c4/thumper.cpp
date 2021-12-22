@@ -96,17 +96,17 @@ int __cdecl main(int argc, char** argv) {
 
   timeBeginPeriod(1);
 
-  // quick
+  //quick
   sweepPowerOff(ZeroCrossingSec, 0.2f);
   sweepPowerOn(1);
 
-  // intermediate
+  //intermediate
   sweepPowerOff(sqrtf(ZeroCrossingSec));
   sweepPowerOn(sqrtf(ZeroCrossingSec));
 
   // slow, thorough
   sweepPowerOff();  
-  sweepPowerOn(); // or resume where left off
+  sweepPowerOn(ZeroCrossingSec, 9.f); // resume where left off
 
   timeEndPeriod(1);
 
