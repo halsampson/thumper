@@ -11,6 +11,7 @@
 #include <iphlpapi.h>
 #include <icmpapi.h>
 #include <stdio.h>
+#include <math.h>
 
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
@@ -78,7 +79,7 @@ void sweepPowerOff(float step = ZeroCrossingSec, float maxSec = 1) {
   }
 }
 
-void sweepPowerUp(float step = ZeroCrossingSec, float minSec = 0, float maxSec = 30) {
+void sweepPowerOn(float step = ZeroCrossingSec, float minSec = 0, float maxSec = 30) {
   for (float onSec = minSec; onSec < maxSec; onSec += step) {  
     printf("On %.3fs ", onSec);
     reset();
@@ -95,10 +96,13 @@ int __cdecl main(int argc, char** argv) {
 
   timeBeginPeriod(1);
 
-  sweepPowerUp(1);
-  sweepPowerOff();  
+  sweepPowerOn(1);
 
-  sweepPowerUp(ZeroCrossingSec, 7.7f); // resume where left off
+  sweepPowerOff(sqrtf(ZeroCrossingSec));
+  sweepPowerOn(sqrtf(ZeroCrossingSec));
+
+  sweepPowerOff();  
+  sweepPowerOn(ZeroCrossingSec, 9.f); // resume where left off
 
   timeEndPeriod(1);
 
