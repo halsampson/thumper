@@ -64,16 +64,13 @@ void bootWait() {
   exit(-1);
 }
 
-void reset(float offSec = 0.2f) {
-  toggleKey(PowerControlKey); // off
-  sleep(offSec); // reset
-  toggleKey(PowerControlKey); // on
-}
-
 void sweepPowerOff(float step = ZeroCrossingSec, float maxSec = 1) {
   for (float offSec = 0; offSec < maxSec; offSec += step) {  
     printf("Off %.3fs ", offSec);
-    reset(offSec);
+    toggleKey(PowerControlKey); // off
+    sleep(offSec);
+    toggleKey(PowerControlKey); // on
+
     bootWait();
   }
 }
@@ -81,9 +78,14 @@ void sweepPowerOff(float step = ZeroCrossingSec, float maxSec = 1) {
 void sweepPowerUp(float step = ZeroCrossingSec, float minSec = 0, float maxSec = 30) {
   for (float onSec = minSec; onSec < maxSec; onSec += step) {  
     printf("On %.3fs ", onSec);
-    reset();
+    toggleKey(PowerControlKey); // off
+    sleep(0.2f); // reset
+    toggleKey(PowerControlKey); // on
     sleep(onSec);  // run
-    reset();
+    toggleKey(PowerControlKey); // off
+    sleep(0.2f); // reset
+    toggleKey(PowerControlKey); // on
+
     bootWait();
   }
 }
@@ -95,7 +97,7 @@ int __cdecl main(int argc, char** argv) {
 
   timeBeginPeriod(1);
 
-  sweepPowerUp(1);
+  sweepPowerUp(1, 14);
   sweepPowerOff();  
 
   sweepPowerUp(ZeroCrossingSec, 7.7f); // resume where left off
