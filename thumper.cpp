@@ -56,7 +56,7 @@ void bootWait() {
     const char send[] = "up";
     ICMP_ECHO_REPLY replies[8];     
     if (IcmpSendEcho2(hIcmpFile, NULL, NULL, NULL, ipaddr, (void*)send, sizeof(send), NULL, replies, sizeof(replies), MinPingWaitMs) && !strcmp((char*)replies[0].Data, send)) { // ping
-      printf("%s in %4.1f s\n", (char*)replies[0].Data, ms / 1000.);
+      printf("%s in %4.1fs\n", (char*)replies[0].Data, ms / 1000.);
       return;
     }
   }
@@ -64,9 +64,9 @@ void bootWait() {
   exit(-1);
 }
 
-void sweepPowerOff() {
-  for (float offSec = 0; offSec < 10; offSec += ZeroCrossingSec) {  
-    printf("Off %6.3f s: ", offSec);
+void sweepPowerOff(float step = ZeroCrossingSec, float maxSec = 1) {
+  for (float offSec = 0; offSec < maxSec; offSec += step) {  
+    printf("Off %.3fs ", offSec);
     toggleKey(PowerControlKey); // off
     sleep(offSec);
     toggleKey(PowerControlKey); // on
@@ -75,15 +75,15 @@ void sweepPowerOff() {
   }
 }
 
-void sweepPowerUp() {
-  for (int onSec = 0; onSec < 20; onSec += ZeroCrossingSec) {  
-    printf("On %6.3f s: ", onSec);
+void sweepPowerUp(float step = ZeroCrossingSec, float maxSec = 30, float minSec = 0) {
+  for (float onSec = minSec; onSec < maxSec; onSec += step) {  
+    printf("On %.3fs ", onSec);
     toggleKey(PowerControlKey); // off
-    sleep(0.1); // reset
+    sleep(0.1f); // reset
     toggleKey(PowerControlKey); // on
     sleep(onSec);  // run
     toggleKey(PowerControlKey); // off
-    sleep(0.1); // reset
+    sleep(0.1f); // reset
     toggleKey(PowerControlKey); // on
 
     bootWait();
@@ -97,8 +97,10 @@ int __cdecl main(int argc, char** argv) {
 
   timeBeginPeriod(1);
 
-  sweepPowerUp();
-  sweepPowerOff();
+  sweepPowerUp(1);
+  sweepPowerOff();  
+
+  sweepPowerUp(ZeroCrossingSec, 30, 7.7f); // resume
 
   timeEndPeriod(1);
 
