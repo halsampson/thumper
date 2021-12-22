@@ -25,7 +25,7 @@ const int ZeroCrossingUs = 1000 * 1000 / 60 / 2;  // 60 Hz;  for higher precisio
 
 
 void usleep(__int64 usec) {
-  LARGE_INTEGER ft; ft.QuadPart = -10 * usec; // 100 ns ticks, negative = relative
+  const LARGE_INTEGER ft = {.QuadPart = -10 * usec}; // 100 ns ticks, negative = relative
   HANDLE timer = CreateWaitableTimer(NULL, TRUE, NULL);
   if (!timer) exit(-3);
   SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
@@ -41,11 +41,7 @@ bool getKeyState(int key) {
 }
 
 void toggleKey(int key) {
-  INPUT inputs[2] = {0};
-  inputs[0].type = inputs[1].type = INPUT_KEYBOARD;
-  inputs[0].ki.wVk = inputs[1].ki.wVk = key;
-  inputs[0].ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
-  inputs[1].ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP;
+  const INPUT inputs[2] = { {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY}}, {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP}} };
   if (SendInput(2, (INPUT*)inputs, sizeof(INPUT)) != 2) exit(-2);
 }
 
