@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32002.185
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thumper", "thumper.vcxproj", "{1B959FAE-463A-44F2-B8F1-29AC3F849504}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Debug|x64.ActiveCfg = Debug|x64
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Debug|x64.Build.0 = Debug|x64
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Debug|x86.ActiveCfg = Debug|Win32
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Debug|x86.Build.0 = Debug|Win32
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Release|x64.ActiveCfg = Release|x64
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Release|x64.Build.0 = Release|x64
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Release|x86.ActiveCfg = Release|Win32
+		{1B959FAE-463A-44F2-B8F1-29AC3F849504}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {59D4B1BC-9F54-4BEC-A7C5-C5B9E6989CF0}
+	EndGlobalSection
+EndGlobal
