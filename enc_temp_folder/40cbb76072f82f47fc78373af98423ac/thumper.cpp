@@ -2,6 +2,7 @@
 
 // Sweep power off / on glitches -- controlled by ScrollLock LED
 
+
 // TODO: test on latest code, best shipped and connected
 
 
@@ -16,18 +17,15 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "Winmm.lib")
 
-const int PowerControlKey = VK_SCROLL;  // VK_NUMLOCK, VK_SCROLL, (VK_CAPITAL)
-
 const char* IPAddrStr = "192.168.1.97"; // address to ping
 const int MinPingWaitMs = 500; // minimum ping wait time (Windowze)
 const int MaxBootWaitMs = 30 * 1000;
+const int PowerControlKey = VK_SCROLL;  // VK_NUMLOCK, VK_SCROLL, (VK_CAPITAL)
+const int ZeroCrossingUs = 1000 * 1000 / 60 / 2;  // 60 Hz;  for higher precision timing use non-zero-crossing optoisolator
 
-const int Hz = 60;
-const float ZeroCrossingSec = 1.f / Hz / 2;  // for higher precision timing use non-zero-crossing optoisolator
 
-
-void sleep(float sec) {
-  LARGE_INTEGER ft = {.QuadPart = (int)(-10000000 * sec)}; // negative = relative 100 ns ticks (10 MHz) 
+void usleep(__int64 usec) {
+  const LARGE_INTEGER ft = {.QuadPart = -10 * usec}; // 100 ns ticks, negative = relative
   HANDLE timer = CreateWaitableTimer(NULL, TRUE, NULL);
   if (!timer) exit(-3);
   SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
@@ -43,7 +41,7 @@ bool getKeyState(int key) {
 }
 
 void toggleKey(int key) {
-  INPUT inputs[2] = { {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY}}, {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP}} };
+  const INPUT inputs[2] = { {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY}}, {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP}} };
   if (SendInput(2, (INPUT*)inputs, sizeof(INPUT)) != 2) exit(-2);
 }
 
@@ -56,7 +54,7 @@ void bootWait() {
     const char send[] = "up";
     ICMP_ECHO_REPLY replies[8];     
     if (IcmpSendEcho2(hIcmpFile, NULL, NULL, NULL, ipaddr, (void*)send, sizeof(send), NULL, replies, sizeof(replies), MinPingWaitMs) && !strcmp((char*)replies[0].Data, send)) { // ping
-      printf("%s in %4.1f s\n", (char*)replies[0].Data, ms / 1000.);
+      printf("%s in %4.1f ms\n", (char*)replies[0].Data, ms / 1000.);
       return;
     }
   }
@@ -65,10 +63,10 @@ void bootWait() {
 }
 
 void sweepPowerOff() {
-  for (float offSec = 0; offSec < 10; offSec += ZeroCrossingSec) {  
-    printf("Off %6.3f s: ", offSec);
+  for (int off_us = 0; off_us < 10 * 1000 * 1000; off_us += ZeroCrossingUs) {  
+    printf("%6.1f ms: ", off_us / 1000.);
     toggleKey(PowerControlKey); // off
-    sleep(offSec);
+    usleep(off_us);
     toggleKey(PowerControlKey); // on
 
     bootWait();
@@ -76,14 +74,14 @@ void sweepPowerOff() {
 }
 
 void sweepPowerUp() {
-  for (int onSec = 0; onSec < 20; onSec += ZeroCrossingSec) {  
-    printf("On %6.3f s: ", onSec);
+  for (int on_us = 0; on_us < 20 * 1000 * 1000; on_us += ZeroCrossingUs) {  
+    printf("%6.1f ms: ", on_us / 1000.);
     toggleKey(PowerControlKey); // off
-    sleep(0.1); // reset
+    usleep(100 * 1000); // reset
     toggleKey(PowerControlKey); // on
-    sleep(onSec);  // run
+    usleep(on_us);  // run
     toggleKey(PowerControlKey); // off
-    sleep(0.1); // reset
+    usleep(100 * 1000); // reset
     toggleKey(PowerControlKey); // on
 
     bootWait();
