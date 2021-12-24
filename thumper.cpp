@@ -44,8 +44,9 @@ bool getKeyState(int key) {
 }
 
 void toggleKey(int key) {
-  INPUT inputs[2] = { {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY}}, {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP}} };
-  if (SendInput(2, (INPUT*)inputs, sizeof(INPUT)) != 2) exit(-2);
+  INPUT inputs[2] = { {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY}},  // press key
+                      {INPUT_KEYBOARD, {key, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP}} }; // release key
+  while (SendInput(2, (INPUT*)inputs, sizeof(INPUT)) != 2);  // retry UIPI blocked keystrokes
 }
 
 
@@ -96,6 +97,8 @@ int __cdecl main(int argc, char** argv) {
 
   timeBeginPeriod(1);
 
+  // sweepPowerOn(ZeroCrossingSec, 24.4f); // resume where left off - typing can interfere
+
   // quick
   sweepPowerOff(ZeroCrossingSec, 0.2f);
   sweepPowerOn(1);
@@ -106,7 +109,7 @@ int __cdecl main(int argc, char** argv) {
 
   // slow, thorough
   sweepPowerOff();  
-  sweepPowerOn(); // or resume where left off
+  sweepPowerOn(); 
 
   timeEndPeriod(1);
 
