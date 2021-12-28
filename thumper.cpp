@@ -17,11 +17,11 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "Winmm.lib")
 
-const int PowerControlKey = VK_SCROLL;  // VK_NUMLOCK, VK_SCROLL, (VK_CAPITAL)
+const int PowerControlKey = VK_NUMLOCK;  // VK_NUMLOCK, VK_SCROLL, (VK_CAPITAL)
+const char* IPAddrStr = "192.168.1.147"; // address to ping  -- set static DHCP lease on AP Services
 
-const char* IPAddrStr = "192.168.1.97"; // address to ping
 const int MinPingWaitMs = 500; // minimum ping wait time (Windowze)
-const int MaxBootWaitMs = 30 * 1000;
+const int MaxBootWaitMs = 90 * 1000;
 
 const int Hz = 60;
 const float ZeroCrossingSec = 1.f / Hz / 2;  // for higher precision timing use non-zero-crossing optoisolator
@@ -92,12 +92,16 @@ void sweepPowerOn(float step = ZeroCrossingSec, float minSec = 0, float maxSec =
 
 
 int __cdecl main(int argc, char** argv) {
-  if (!getKeyState(VK_SCROLL))
-    toggleKey(VK_SCROLL);  // set initially on
+  if (!getKeyState(PowerControlKey))
+    toggleKey(PowerControlKey);  // set initially on
 
   timeBeginPeriod(1);
 
-  // sweepPowerOn(ZeroCrossingSec, 24.4f); // resume where left off - typing can interfere
+#if 1
+  sweepPowerOn(ZeroCrossingSec, 4.8f); // resume where left off
+  return 0;
+#endif
+
 
   // quick
   sweepPowerOff(ZeroCrossingSec, 0.2f);
@@ -114,4 +118,5 @@ int __cdecl main(int argc, char** argv) {
   timeEndPeriod(1);
 
   // IcmpCloseHandle(hIcmpFile);
+  return 0;
 }
